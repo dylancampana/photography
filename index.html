@@ -5,29 +5,46 @@ layout: default
 <!-- Wrapper -->
 <div id="wrapper">
 
-    <!-- Header -->
+    <!-- Header with Navigation -->
     <header id="header">
         <h1><a href="index.html"><strong>{{ site.header.title }}</strong> {{ site.header.subtitle }}</a></h1>
-        <nav>
+        <nav class="main-nav">
             <ul>
-                <li><a href="#footer" class="icon fa-info-circle">About</a></li>
+                <li><a href="#portraits" class="active">Portraits</a></li>
+                <li><a href="#footer">About</a></li>
+                <li><a href="#contact">Contact</a></li>
+                <li><a href="{{ site.social_urls.instagram }}">Instagram</a></li>
+                <li><a href="#footer" class="icon fa-info-circle">More</a></li>
             </ul>
         </nav>
     </header>
 
-    <!-- Main -->
+    <!-- Main Carousel Content -->
     <div id="main" data-exif='{{ site.exif }}'>
-        {% for image in site.static_files %}
-        {% if image.path contains 'fulls' %}
-        <article class="thumb">
-            <a href="{{ site.baseurl }}{{ site.image_fulls_loc }}/{{ image.name }}" class="image">
-                <img src="{{ site.baseurl }}{{ site.image_thumbs_loc }}/{{ image.name }}" alt=""
-                     data-name="{{ image.name }}"/></a>
-            <!--<h2></h2>
-            <p></p>-->
-        </article>
-        {% endif %}
-        {% endfor %}
+        <div class="carousel-container">
+            <div class="carousel">
+                {% for image in site.static_files %}
+                {% if image.path contains 'fulls' %}
+                <div class="carousel-item">
+                    <article class="thumb">
+                        <a href="{{ site.baseurl }}{{ site.image_fulls_loc }}/{{ image.name }}" class="image">
+                            <img src="{{ site.baseurl }}{{ site.image_thumbs_loc }}/{{ image.name }}" alt=""
+                                 data-name="{{ image.name }}"/></a>
+                    </article>
+                </div>
+                {% endif %}
+                {% endfor %}
+            </div>
+            
+            <!-- Carousel Controls -->
+            <div class="carousel-controls">
+                <button class="carousel-prev">&#10094;</button>
+                <button class="carousel-next">&#10095;</button>
+            </div>
+            
+            <!-- Carousel Indicators -->
+            <div class="carousel-indicators"></div>
+        </div>
     </div>
 
     <!-- Footer -->
@@ -105,7 +122,7 @@ layout: default
                     &copy; {{ site.author }}. Design: {{ site.web_design }}
                 </p>
             </div>
-            <div>
+            <div id="contact">
                 <section>
                     <h2>Get in touch</h2>
                     <form method="post" action="#">
@@ -128,3 +145,185 @@ layout: default
         </div>
     </footer>
 </div>
+
+<style>
+    /* Carousel Styles */
+    .carousel-container {
+        position: relative;
+        max-width: 1200px;
+        margin: 0 auto;
+        overflow: hidden;
+    }
+    
+    .carousel {
+        display: flex;
+        transition: transform 0.5s ease;
+    }
+    
+    .carousel-item {
+        min-width: 100%;
+        box-sizing: border-box;
+        padding: 20px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    
+    .carousel-item img {
+        max-width: 100%;
+        max-height: 70vh;
+        object-fit: contain;
+    }
+    
+    .carousel-controls {
+        position: absolute;
+        top: 50%;
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        transform: translateY(-50%);
+        pointer-events: none;
+    }
+    
+    .carousel-prev, .carousel-next {
+        pointer-events: all;
+        background: rgba(0, 0, 0, 0.5);
+        color: white;
+        border: none;
+        padding: 15px;
+        cursor: pointer;
+        font-size: 24px;
+        transition: background 0.3s;
+    }
+    
+    .carousel-prev:hover, .carousel-next:hover {
+        background: rgba(0, 0, 0, 0.8);
+    }
+    
+    .carousel-indicators {
+        display: flex;
+        justify-content: center;
+        margin-top: 20px;
+    }
+    
+    .carousel-indicator {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: #ccc;
+        margin: 0 5px;
+        cursor: pointer;
+        transition: background 0.3s;
+    }
+    
+    .carousel-indicator.active {
+        background: #333;
+    }
+    
+    /* Navigation Styles */
+    .main-nav {
+        margin-top: 10px;
+    }
+    
+    .main-nav ul {
+        display: flex;
+        justify-content: center;
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    
+    .main-nav li {
+        margin: 0 10px;
+    }
+    
+    .main-nav a {
+        text-decoration: none;
+        color: inherit;
+        padding: 5px 10px;
+        border-radius: 4px;
+        transition: background 0.3s;
+    }
+    
+    .main-nav a:hover, .main-nav a.active {
+        background: rgba(255, 255, 255, 0.1);
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .main-nav ul {
+            flex-wrap: wrap;
+        }
+        
+        .main-nav li {
+            margin: 5px;
+        }
+        
+        .carousel-controls {
+            top: 40%;
+        }
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize carousel
+        const carousel = document.querySelector('.carousel');
+        const items = document.querySelectorAll('.carousel-item');
+        const prevBtn = document.querySelector('.carousel-prev');
+        const nextBtn = document.querySelector('.carousel-next');
+        const indicatorsContainer = document.querySelector('.carousel-indicators');
+        
+        let currentIndex = 0;
+        const totalItems = items.length;
+        
+        // Create indicators
+        for (let i = 0; i < totalItems; i++) {
+            const indicator = document.createElement('div');
+            indicator.classList.add('carousel-indicator');
+            if (i === 0) indicator.classList.add('active');
+            indicator.addEventListener('click', () => {
+                goToSlide(i);
+            });
+            indicatorsContainer.appendChild(indicator);
+        }
+        
+        // Navigation functions
+        function goToSlide(index) {
+            if (index < 0) index = totalItems - 1;
+            if (index >= totalItems) index = 0;
+            
+            currentIndex = index;
+            carousel.style.transform = `translateX(-${currentIndex * 100}%)`;
+            
+            // Update indicators
+            document.querySelectorAll('.carousel-indicator').forEach((ind, i) => {
+                ind.classList.toggle('active', i === currentIndex);
+            });
+        }
+        
+        // Event listeners
+        prevBtn.addEventListener('click', () => goToSlide(currentIndex - 1));
+        nextBtn.addEventListener('click', () => goToSlide(currentIndex + 1));
+        
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft') goToSlide(currentIndex - 1);
+            if (e.key === 'ArrowRight') goToSlide(currentIndex + 1);
+        });
+        
+        // Auto-advance (optional)
+        // setInterval(() => goToSlide(currentIndex + 1), 5000);
+        
+        // Navigation links
+        document.querySelectorAll('.main-nav a').forEach(link => {
+            link.addEventListener('click', function(e) {
+                if (this.getAttribute('href') === '#portraits') {
+                    e.preventDefault();
+                    // This would need to be implemented based on how you want to show the grid
+                    alert('Portraits grid view would be shown here');
+                }
+            });
+        });
+    });
+</script>
