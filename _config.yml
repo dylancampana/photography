@@ -1,7 +1,5 @@
 title: Dylan Campana Photography
 description: New York-based photographer and visual artist
-baseurl: "" # the subpath of your site
-url: "" # the base hostname & protocol for your site
 
 # Image directories
 image_fulls_loc: "/images/fulls"
