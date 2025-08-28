@@ -1,22 +1,40 @@
-# Base configs
+title: Dylan Campana Photography
+description: New York-based photographer and visual artist
+baseurl: "" # the subpath of your site
+url: "" # the base hostname & protocol for your site
+
+# Image directories
 image_fulls_loc: "/images/fulls"
 image_thumbs_loc: "/images/thumbs"
 
-# UI configs
-title: "Dylan"
-subtitle: "Dylan Again"
-author: "Dylan"
+# Site settings
 header:
- title: "Photography"
- subtitle: "by Dylan Victor René '5Skin' Campana"
+  title: Dylan
+  subtitle: Campana
+
 footer:
- name: "Hey there, my name is Dylan"
- bio: "I am a Dylan."
- github: "Want a website like this for DYlan.?"
-web_design: "BC"
-# Configure which exif data to display
-# Tag is the actual exif tag, icon is a fontawesome icon. Use JSON notation without line breaks
-# exif: '[{"tag": "Model", "icon": "camera-retro"}, {"tag": "FNumber", "icon": "dot-circle-o"}, {"tag": "ExposureTime", "icon": "clock-o"}, {"tag": "ISOSpeedRatings", "icon": "info-circle"}]'
+  name: Dylan Campana
+  bio: New York-based photographer and visual artist working primarily with portraiture and urban landscapes.
+
 social_urls:
-  instagram: "https://www.instagram.com/dylandeluge"
-  github: "https://www.github.com/dylancampana"
+  instagram: "https://instagram.com/dylandeluge/"
+
+author: Dylan Campana
+web_design: Custom Design
+
+# Build settings
+markdown: kramdown
+plugins:
+  - jekyll-feed
+
+# Collections
+collections:
+  galleries:
+    output: true
+
+# Include static files
+include:
+  - _pages
+
+# Processing
+safe: false

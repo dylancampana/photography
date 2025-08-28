@@ -1,9 +1,14 @@
+---
+layout: default
+title: Dylan Campana Photography
+---
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dylan Campana Photography</title>
+    <title>{{ page.title }}</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -311,7 +316,7 @@
 <body>
     <!-- Header -->
     <header id="header">
-        <h1><a href="index.html">Dylan Campana</a></h1>
+        <h1><a href="{{ '/' | relative_url }}">Dylan Campana</a></h1>
         <nav class="main-nav">
             <ul>
                 <li><a href="#" id="portraits-link">Portraits</a></li>
@@ -325,29 +330,60 @@
     <!-- Main Carousel -->
     <div class="carousel-container" id="carousel-view">
         <div class="carousel">
-            {% for image in site.static_files %}
-                {% if image.path contains 'fulls' %}
-                    <div class="carousel-item {% if forloop.first %}active{% endif %}">
-                        <img src="{{ site.baseurl }}{{ site.image_fulls_loc }}/{{ image.name }}" alt="Photography by Dylan Campana">
-                        <div class="image-caption">{{ image.name | split: '.' | first | replace: '-', ' ' | capitalize }}</div>
-                    </div>
-                {% endif %}
+            {% assign image_files = site.static_files | where: "image", true %}
+            {% assign full_images = image_files | where_exp: "item", "item.path contains 'fulls'" %}
+            {% for image in full_images limit: 10 %}
+                <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                    <img src="{{ image.path | relative_url }}" alt="Photography by Dylan Campana">
+                    <div class="image-caption">{{ image.name | split: '.' | first | replace: '-', ' ' | replace: '_', ' ' | capitalize }}</div>
+                </div>
             {% endfor %}
+            
+            <!-- Fallback images if no images found -->
+            {% if full_images.size == 0 %}
+                <div class="carousel-item active">
+                    <img src="https://picsum.photos/1920/1080?random=1" alt="Photography by Dylan Campana">
+                    <div class="image-caption">Sample Portrait 1</div>
+                </div>
+                <div class="carousel-item">
+                    <img src="https://picsum.photos/1920/1080?random=2" alt="Photography by Dylan Campana">
+                    <div class="image-caption">Sample Portrait 2</div>
+                </div>
+                <div class="carousel-item">
+                    <img src="https://picsum.photos/1920/1080?random=3" alt="Photography by Dylan Campana">
+                    <div class="image-caption">Sample Portrait 3</div>
+                </div>
+                <div class="carousel-item">
+                    <img src="https://picsum.photos/1920/1080?random=4" alt="Photography by Dylan Campana">
+                    <div class="image-caption">Sample Portrait 4</div>
+                </div>
+            {% endif %}
         </div>
     </div>
 
     <!-- Masonry Gallery -->
     <div class="gallery-container" id="masonry-view">
         <div class="masonry-grid">
-            {% for image in site.static_files %}
-                {% if image.path contains 'thumbs' %}
+            {% assign thumb_images = image_files | where_exp: "item", "item.path contains 'thumbs'" %}
+            {% for image in thumb_images limit: 20 %}
+                <div class="grid-item">
+                    {% assign full_path = image.path | replace: 'thumbs', 'fulls' %}
+                    <a href="{{ full_path | relative_url }}" class="image">
+                        <img src="{{ image.path | relative_url }}" alt="Photography by Dylan Campana"/>
+                    </a>
+                </div>
+            {% endfor %}
+            
+            <!-- Fallback images if no thumbnails found -->
+            {% if thumb_images.size == 0 %}
+                {% for i in (1..12) %}
                     <div class="grid-item">
-                        <a href="{{ site.baseurl }}{{ site.image_fulls_loc }}/{{ image.name }}" class="image">
-                            <img src="{{ site.baseurl }}{{ site.image_thumbs_loc }}/{{ image.name }}" alt=""/>
+                        <a href="https://picsum.photos/1920/1080?random={{ i }}" class="image">
+                            <img src="https://picsum.photos/400/{{ 300 | plus: forloop.index0 | times: 20 }}?random={{ i }}" alt="Photography by Dylan Campana"/>
                         </a>
                     </div>
-                {% endif %}
-            {% endfor %}
+                {% endfor %}
+            {% endif %}
         </div>
     </div>
 
@@ -361,7 +397,7 @@
             </ul>
         </nav>
         <div class="copyright">
-            &copy; 2023 Dylan Campana Photography
+            &copy; {% date "%Y" %} Dylan Campana Photography
         </div>
     </footer>
 
