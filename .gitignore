@@ -76,3 +76,17 @@ jspm_packages
 .node_repl_history
 
 /Gemfile.lock
+
+
+_site/
+.sass-cache/
+.jekyll-cache/
+.jekyll-metadata
+.bundle/
+vendor/
+Gemfile.lock
+node_modules/
+*.gem
+*.swp
+*~
+.DS_Store

@@ -78,12 +78,16 @@ title: Dylan Campana Photography
             width: 100vw;
             height: 100vh;
             overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #000;
         }
         
         .carousel {
             display: flex;
-            width: 100%;
-            height: 100%;
+            width: 80%;
+            height: 80%;
             transition: transform 0.8s cubic-bezier(0.23, 1, 0.32, 1);
         }
         
@@ -93,12 +97,13 @@ title: Dylan Campana Photography
             display: flex;
             justify-content: center;
             align-items: center;
+            padding: 2rem;
         }
         
         .carousel-item img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
             opacity: 0;
             transition: opacity 1.2s ease;
         }
@@ -142,6 +147,7 @@ title: Dylan Campana Photography
             height: auto;
             display: block;
             transition: transform 0.3s ease;
+            cursor: pointer;
         }
         
         .grid-item img:hover {
@@ -274,6 +280,58 @@ title: Dylan Campana Photography
             mix-blend-mode: difference;
         }
         
+        /* Image Lightbox/Zoom Styles */
+        .image-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(40,40,40,0.95) 0%, rgba(0,0,0,0.98) 70%);
+            z-index: 3000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .image-overlay.active {
+            display: flex;
+            opacity: 1;
+        }
+        
+        .image-overlay img {
+            max-width: 90%;
+            max-height: 90%;
+            object-fit: contain;
+            border-radius: 4px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.8);
+        }
+        
+        .image-overlay .close-overlay {
+            position: absolute;
+            top: 2rem;
+            right: 2rem;
+            font-size: 2rem;
+            color: #fff;
+            cursor: pointer;
+            z-index: 3001;
+            opacity: 0.8;
+            transition: opacity 0.3s ease;
+        }
+        
+        .image-overlay .close-overlay:hover {
+            opacity: 1;
+        }
+        
+        /* Make carousel and gallery images clickable */
+        .carousel-item img,
+        .grid-item img {
+            cursor: pointer;
+        }
+        
         /* Mobile Responsive */
         @media (max-width: 768px) {
             #header {
@@ -304,11 +362,21 @@ title: Dylan Campana Photography
             .masonry-grid {
                 column-count: 2;
             }
+            
+            .carousel {
+                width: 90%;
+                height: 70%;
+            }
         }
         
         @media (max-width: 480px) {
             .masonry-grid {
                 column-count: 1;
+            }
+            
+            .carousel {
+                width: 95%;
+                height: 60%;
             }
         }
     </style>
@@ -321,7 +389,7 @@ title: Dylan Campana Photography
             <ul>
                 <li><a href="#" id="portraits-link">Portraits</a></li>
                 <li><a href="#about">About</a></li>
-                <li><a href="#contact">Contact</a></li>
+                <li><a href="mailto:dylancampanaphoto@protonmail.com">Contact</a></li>
                 <li><a href="https://instagram.com/dylandeluge/">Instagram</a></li>
             </ul>
         </nav>
@@ -335,7 +403,7 @@ title: Dylan Campana Photography
             {% for image in full_images limit: 10 %}
                 <div class="carousel-item {% if forloop.first %}active{% endif %}">
                     <img src="{{ image.path | relative_url }}" alt="Photography by Dylan Campana">
-                    <div class="image-caption">{{ image.name | split: '.' | first | replace: '-', ' ' | replace: '_', ' ' | capitalize }}</div>
+                    <!-- <div class="image-caption">{{ image.name | split: '.' | first | replace: '-', ' ' | replace: '_', ' ' | capitalize }}</div> -->
                 </div>
             {% endfor %}
             
@@ -390,21 +458,22 @@ title: Dylan Campana Photography
     <!-- Footer -->
     <footer id="footer">
         <nav class="footer-nav">
-            <ul>
-                <li><a href="mailto:dylancampanaphoto@protonmail.com">Email</a></li>
-                <li><a href="#prints">Prints</a></li>
-                <li><a href="#archive">Archive</a></li>
-            </ul>
         </nav>
         <div class="copyright">
-            &copy; {% date "%Y" %} Dylan Campana Photography
+            &copy; {{ "now" | date: "%Y" }} Dylan Campana Photography
         </div>
     </footer>
 
     <!-- View Toggle Button -->
-    <div class="view-toggle" id="view-toggle">
+    <!-- <div class="view-toggle" id="view-toggle">
         <i class="fas fa-th" id="grid-icon"></i>
         <i class="fas fa-sliders-h" id="carousel-icon" style="display: none;"></i>
+    </div> -->
+
+    <!-- Image Overlay for Zoom -->
+    <div class="image-overlay" id="imageOverlay">
+        <span class="close-overlay">&times;</span>
+        <img src="" alt="Zoomed image" id="overlayImage">
     </div>
 
     <!-- About Panel -->
@@ -416,7 +485,7 @@ title: Dylan Campana Photography
         <p>With a background in fine arts and photography, Dylan's work has been exhibited in galleries across New York and featured in several publications.</p>
         
         <div class="contact-form">
-            <h2>Get in touch</h2>
+            <!-- <h2>Get in touch</h2>
             <form method="post" action="#">
                 <div class="field half first">
                     <input type="text" name="name" id="name" placeholder="Name"/>
@@ -431,7 +500,7 @@ title: Dylan Campana Photography
                     <li><input type="submit" value="Send" class="special"/></li>
                     <li><input type="reset" value="Reset"/></li>
                 </ul>
-            </form>
+            </form> -->
         </div>
     </div>
 
@@ -474,7 +543,7 @@ title: Dylan Campana Photography
             // Auto-advance carousel
             function startCarousel() {
                 if (items.length > 1) {
-                    carouselInterval = setInterval(nextSlide, 5000); // Change slide every 5 seconds
+                    carouselInterval = setInterval(nextSlide, 2000); // Change slide every 2 seconds
                 }
             }
             
@@ -570,6 +639,66 @@ title: Dylan Campana Photography
             const carouselIcon = document.getElementById('carousel-icon');
             const portraitsLink = document.getElementById('portraits-link');
             
+            // Image overlay/zoom functionality
+            const imageOverlay = document.getElementById('imageOverlay');
+            const overlayImage = document.getElementById('overlayImage');
+            const closeOverlay = document.querySelector('.close-overlay');
+            const carouselImages = document.querySelectorAll('.carousel-item img');
+            const galleryImages = document.querySelectorAll('.grid-item img');
+            
+            // Function to show image in overlay
+            function showImageOverlay(imageSrc, imageAlt) {
+                overlayImage.src = imageSrc;
+                overlayImage.alt = imageAlt || 'Zoomed image';
+                imageOverlay.classList.add('active');
+                document.body.style.overflow = 'hidden'; // Prevent scrolling when overlay is open
+            }
+            
+            // Function to hide image overlay
+            function hideImageOverlay() {
+                imageOverlay.classList.remove('active');
+                document.body.style.overflow = ''; // Restore scrolling
+                setTimeout(() => {
+                    overlayImage.src = '';
+                }, 300);
+            }
+            
+            // Add click listeners to carousel images
+            carouselImages.forEach(img => {
+                img.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    showImageOverlay(this.src, this.alt);
+                });
+            });
+            
+            // Add click listeners to gallery images
+            galleryImages.forEach(img => {
+                img.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    // Get the full-size image URL from the parent link's href
+                    const parentLink = this.closest('a');
+                    const fullImageSrc = parentLink ? parentLink.href : this.src;
+                    showImageOverlay(fullImageSrc, this.alt);
+                });
+            });
+            
+            // Close overlay when clicking on it
+            if (imageOverlay) {
+                imageOverlay.addEventListener('click', function(e) {
+                    if (e.target === this || e.target === closeOverlay) {
+                        hideImageOverlay();
+                    }
+                });
+            }
+            
+            // Close overlay with escape key
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && imageOverlay.classList.contains('active')) {
+                    hideImageOverlay();
+                }
+            });
+            
             if (viewToggle && carouselView && masonryView) {
                 viewToggle.addEventListener('click', function() {
                     if (carouselView.style.display !== 'none') {
@@ -578,6 +707,18 @@ title: Dylan Campana Photography
                         masonryView.style.display = 'block';
                         gridIcon.style.display = 'none';
                         carouselIcon.style.display = 'block';
+                        
+                        // Re-add click listeners to newly visible gallery images
+                        const newGalleryImages = document.querySelectorAll('.grid-item img');
+                        newGalleryImages.forEach(img => {
+                            img.addEventListener('click', function(e) {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                const parentLink = this.closest('a');
+                                const fullImageSrc = parentLink ? parentLink.href : this.src;
+                                showImageOverlay(fullImageSrc, this.alt);
+                            });
+                        });
                     } else {
                         // Switch to carousel view
                         masonryView.style.display = 'none';
@@ -596,6 +737,18 @@ title: Dylan Campana Photography
                     masonryView.style.display = 'block';
                     gridIcon.style.display = 'none';
                     carouselIcon.style.display = 'block';
+                    
+                    // Re-add click listeners to newly visible gallery images
+                    const newGalleryImages = document.querySelectorAll('.grid-item img');
+                    newGalleryImages.forEach(img => {
+                        img.addEventListener('click', function(e) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            const parentLink = this.closest('a');
+                            const fullImageSrc = parentLink ? parentLink.href : this.src;
+                            showImageOverlay(fullImageSrc, this.alt);
+                        });
+                    });
                 });
             }
         });

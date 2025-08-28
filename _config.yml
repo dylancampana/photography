@@ -24,8 +24,12 @@ web_design: Custom Design
 
 # Build settings
 markdown: kramdown
+theme: jekyll-theme-primer
 plugins:
   - jekyll-feed
+  - jekyll-sitemap
+  - jekyll-seo-tag
+  - jekyll-github-metadata
 
 # Collections
 collections:
@@ -35,6 +39,43 @@ collections:
 # Include static files
 include:
   - _pages
+  - images
+
+# Exclude from processing
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - README.md
+  - node_modules
+  - vendor
 
 # Processing
 safe: false
+encoding: utf-8
+highlighter: rouge
+
+# Pagination
+paginate: 10
+paginate_path: "/page:num/"
+
+# Sass settings
+sass:
+  style: compressed
+  sass_dir: _sass
+
+# Defaults
+defaults:
+  - scope:
+      path: ""
+      type: "pages"
+    values:
+      layout: "default"
+  - scope:
+      path: ""
+      type: "posts"
+    values:
+      layout: "post"
+  - scope:
+      path: "images"
+    values:
+      image: true
